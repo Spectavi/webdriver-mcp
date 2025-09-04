@@ -1,19 +1,8 @@
-[![MseeP.ai Security Assessment Badge](https://mseep.net/pr/angiejones-mcp-selenium-badge.png)](https://mseep.ai/app/angiejones-mcp-selenium)
-
-# MCP Selenium Server
-
-<a href="https://glama.ai/mcp/servers/s2em7b2kwf">
-  <img width="380" height="200" src="https://glama.ai/mcp/servers/s2em7b2kwf/badge" />
-</a>
+# WebDriver MCP Server
 
 [![smithery badge](https://smithery.ai/badge/@angiejones/mcp-selenium)](https://smithery.ai/server/@angiejones/mcp-selenium)
 
-A Model Context Protocol (MCP) server implementation for Selenium WebDriver, enabling browser automation through standardized MCP clients.
-
-## Video Demo (Click to Watch)
-
-[![Watch the video](https://img.youtube.com/vi/mRV0N8hcgYA/sddefault.jpg)](https://youtu.be/mRV0N8hcgYA)
-
+A Model Context Protocol (MCP) server implementation for Selenium WebDriver.
 
 ## Features
 
@@ -26,6 +15,7 @@ A Model Context Protocol (MCP) server implementation for Selenium WebDriver, ena
 - Take screenshots
 - Upload files
 - Support for headless mode
+- Execute JavaScript
 
 ## Supported Browsers
 

@@ -1,7 +1,7 @@
 {
-  "name": "@angiejones/mcp-selenium",
+  "name": "@Spectavi/webdriver-mcp",
   "version": "0.1.21",
-  "description": "Selenium WebDriver MCP Server",
+  "description": "WebDriver MCP Server",
   "type": "module",
   "main": "src/lib/server.js",
   "bin": {
