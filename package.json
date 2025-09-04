@@ -1,5 +1,5 @@
 {
-  "name": "@Spectavi/webdriver-mcp",
+  "name": "@spectavi/webdriver-mcp",
   "version": "0.1.21",
   "description": "WebDriver MCP Server",
   "type": "module",
