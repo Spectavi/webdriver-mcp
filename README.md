@@ -23,21 +23,12 @@ A Model Context Protocol (MCP) server implementation for Selenium WebDriver.
 - Firefox
 - MS Edge
 
-## Use with Goose
-
-### Option 1: One-click install
-Copy and paste the link below into a browser address bar to add this extension to goose desktop:
-
-```
-goose://extension?cmd=npx&arg=-y&arg=%40angiejones%2Fmcp-selenium&id=selenium-mcp&name=Selenium%20MCP&description=automates%20browser%20interactions
-```
-
 
 ### Option 2: Add manually to desktop or CLI
 
-* Name: `Selenium MCP`
-* Description: `automates browser interactions`
-* Command: `npx -y @angiejones/mcp-selenium`
+* Name: `WebDriver MCP`
+* Description: `Describes WebDriver API to AI agents.`
+* Command: `npx -y @Spectavi/webdriver-mcp`
 
 ## Use with other MCP clients (e.g. Claude Desktop, etc)
 ```json
@@ -45,7 +36,7 @@ goose://extension?cmd=npx&arg=-y&arg=%40angiejones%2Fmcp-selenium&id=selenium-mc
   "mcpServers": {
     "selenium": {
       "command": "npx",
-      "args": ["-y", "@angiejones/mcp-selenium"]
+      "args": ["-y", "@Spectavi/webdriver-mcp"]
     }
   }
 }
@@ -63,17 +54,9 @@ To work on this project:
 
 ### Installation
 
-#### Installing via Smithery
-
-To install MCP Selenium for Claude Desktop automatically via [Smithery](https://smithery.ai/server/@angiejones/mcp-selenium):
-
-```bash
-npx -y @smithery/cli install @angiejones/mcp-selenium --client claude
-```
-
 #### Manual Installation
 ```bash
-npm install -g @angiejones/mcp-selenium
+npm install -g @Spectavi/webdriver-mcp
 ```
 
 
@@ -82,7 +65,7 @@ npm install -g @angiejones/mcp-selenium
 Start the server by running:
 
 ```bash
-mcp-selenium
+webdriver-mcp
 ```
 
 Or use with NPX in your MCP configuration:
@@ -90,11 +73,11 @@ Or use with NPX in your MCP configuration:
 ```json
 {
   "mcpServers": {
-    "selenium": {
+    "webdriver": {
       "command": "npx",
       "args": [
         "-y",
-        "@angiejones/mcp-selenium"
+        "@Spectavi/webdriver-mcp"
       ]
     }
   }
@@ -411,6 +394,26 @@ Captures a screenshot of the current page.
   "tool": "take_screenshot",
   "parameters": {
     "outputPath": "/path/to/screenshot.png"
+  }
+}
+```
+
+### execute_javascript
+Executes JavaScript code on the current page.
+
+**Parameters:**
+- `script` (required): JavaScript code to execute
+  - Type: string
+- `args` (optional): Arguments to pass to the script
+  - Type: array
+
+**Example:**
+```json
+{
+  "tool": "execute_javascript",
+  "parameters": {
+    "script": "return document.title;",
+    "args": []
   }
 }
 ```
