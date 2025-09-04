@@ -5,7 +5,7 @@
   "type": "module",
   "main": "src/lib/server.js",
   "bin": {
-    "mcp-selenium": "./src/lib/server.js"
+    "webdriver-mcp": "./src/lib/server.js"
   },
   "scripts": {
     "start": "node src/lib/server.js",
