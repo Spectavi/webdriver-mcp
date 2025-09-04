@@ -26,7 +26,7 @@ A Model Context Protocol (MCP) server implementation for Selenium WebDriver.
 
 * Name: `WebDriver MCP`
 * Description: `Describes WebDriver API to AI agents.`
-* Command: `npx -y @Spectavi/webdriver-mcp`
+* Command: `npx -y @spectavi/webdriver-mcp`
 
 ## Use with other MCP clients (e.g. Claude Desktop, etc)
 ```json
@@ -34,7 +34,7 @@ A Model Context Protocol (MCP) server implementation for Selenium WebDriver.
   "mcpServers": {
     "selenium": {
       "command": "npx",
-      "args": ["-y", "@Spectavi/webdriver-mcp"]
+      "args": ["-y", "@spectavi/webdriver-mcp"]
     }
   }
 }
@@ -54,7 +54,7 @@ To work on this project:
 
 #### Manual Installation
 ```bash
-npm install -g @Spectavi/webdriver-mcp
+npm install -g @spectavi/webdriver-mcp
 ```
 
 
@@ -75,7 +75,7 @@ Or use with NPX in your MCP configuration:
       "command": "npx",
       "args": [
         "-y",
-        "@Spectavi/webdriver-mcp"
+        "@spectavi/webdriver-mcp"
       ]
     }
   }
