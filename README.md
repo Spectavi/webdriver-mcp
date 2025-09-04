@@ -1,7 +1,5 @@
 # WebDriver MCP Server
 
-[![smithery badge](https://smithery.ai/badge/@angiejones/mcp-selenium)](https://smithery.ai/server/@angiejones/mcp-selenium)
-
 A Model Context Protocol (MCP) server implementation for Selenium WebDriver.
 
 ## Features
@@ -436,3 +434,5 @@ None required
 ## License
 
 MIT
+
+* Project forked from https://github.com/angiejones/mcp-selenium
