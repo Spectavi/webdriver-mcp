@@ -8,6 +8,7 @@
     "mcp-selenium": "./src/lib/server.js"
   },
   "scripts": {
+    "start": "node src/lib/server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
