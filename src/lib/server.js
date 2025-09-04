@@ -423,6 +423,28 @@ server.tool(
 );
 
 server.tool(
+    "execute_javascript",
+    "executes JavaScript code on the current page",
+    {
+        script: z.string().describe("JavaScript code to execute"),
+        args: z.array(z.any()).optional().describe("Arguments to pass to the script")
+    },
+    async ({ script, args = [] }) => {
+        try {
+            const driver = getDriver();
+            const result = await driver.executeScript(script, ...args);
+            return {
+                content: [{ type: 'text', text: result !== null && result !== undefined ? JSON.stringify(result, null, 2) : 'Script executed successfully (no return value)' }]
+            };
+        } catch (e) {
+            return {
+                content: [{ type: 'text', text: `Error executing JavaScript: ${e.message}` }]
+            };
+        }
+    }
+);
+
+server.tool(
     "close_session",
     "closes the current browser session",
     {},
