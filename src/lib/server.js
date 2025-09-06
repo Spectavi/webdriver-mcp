@@ -359,6 +359,183 @@ server.tool(
     }
 );
 
+// Waiting and Visibility Tools
+server.tool(
+    "wait_for_element_visible",
+    "waits until an element is visible",
+    {
+        ...locatorSchema
+    },
+    async ({ by, value, timeout = 10000 }) => {
+        try {
+            const driver = getDriver();
+            const locator = getLocator(by, value);
+            const element = await driver.wait(until.elementLocated(locator), timeout);
+            await driver.wait(until.elementIsVisible(element), timeout);
+            return {
+                content: [{ type: 'text', text: 'Element is visible' }]
+            };
+        } catch (e) {
+            return {
+                content: [{ type: 'text', text: `Error waiting for element visibility: ${e.message}` }]
+            };
+        }
+    }
+);
+
+server.tool(
+    "wait_for_element_not_visible",
+    "waits until an element is not visible",
+    {
+        ...locatorSchema
+    },
+    async ({ by, value, timeout = 10000 }) => {
+        try {
+            const driver = getDriver();
+            const locator = getLocator(by, value);
+            const element = await driver.wait(until.elementLocated(locator), timeout);
+            await driver.wait(until.elementIsNotVisible(element), timeout);
+            return {
+                content: [{ type: 'text', text: 'Element is not visible' }]
+            };
+        } catch (e) {
+            return {
+                content: [{ type: 'text', text: `Error waiting for element to become invisible: ${e.message}` }]
+            };
+        }
+    }
+);
+
+server.tool(
+    "wait_for_text",
+    "waits until an element's text matches or contains a given value",
+    {
+        ...locatorSchema,
+        text: z.string().describe("Text to wait for"),
+        contains: z.boolean().optional().describe("Whether to match partial text")
+    },
+    async ({ by, value, text, contains = false, timeout = 10000 }) => {
+        try {
+            const driver = getDriver();
+            const locator = getLocator(by, value);
+            const element = await driver.wait(until.elementLocated(locator), timeout);
+            if (contains) {
+                await driver.wait(until.elementTextContains(element, text), timeout);
+            } else {
+                await driver.wait(until.elementTextIs(element, text), timeout);
+            }
+            return {
+                content: [{ type: 'text', text: `Text '${text}' ${contains ? 'found in' : 'matches'} element` }]
+            };
+        } catch (e) {
+            return {
+                content: [{ type: 'text', text: `Error waiting for text: ${e.message}` }]
+            };
+        }
+    }
+);
+
+server.tool(
+    "wait_for_attribute",
+    "waits until an element's attribute has a given value",
+    {
+        ...locatorSchema,
+        attribute: z.string().describe("Attribute name"),
+        expected: z.string().describe("Expected attribute value"),
+        contains: z.boolean().optional().describe("Whether to match partial value")
+    },
+    async ({ by, value, attribute, expected, contains = false, timeout = 10000 }) => {
+        try {
+            const driver = getDriver();
+            const locator = getLocator(by, value);
+            const element = await driver.wait(until.elementLocated(locator), timeout);
+            await driver.wait(async () => {
+                const attr = await element.getAttribute(attribute);
+                return contains ? attr?.includes(expected) : attr === expected;
+            }, timeout);
+            return {
+                content: [{ type: 'text', text: `Attribute '${attribute}' ${contains ? 'contains' : 'equals'} '${expected}'` }]
+            };
+        } catch (e) {
+            return {
+                content: [{ type: 'text', text: `Error waiting for attribute: ${e.message}` }]
+            };
+        }
+    }
+);
+
+// Element Metadata Tools
+server.tool(
+    "get_element_attribute",
+    "gets an attribute value of an element",
+    {
+        ...locatorSchema,
+        attribute: z.string().describe("Attribute name to retrieve")
+    },
+    async ({ by, value, attribute, timeout = 10000 }) => {
+        try {
+            const driver = getDriver();
+            const locator = getLocator(by, value);
+            const element = await driver.wait(until.elementLocated(locator), timeout);
+            const attrValue = await element.getAttribute(attribute);
+            return {
+                content: [{ type: 'text', text: attrValue ?? '' }]
+            };
+        } catch (e) {
+            return {
+                content: [{ type: 'text', text: `Error getting attribute: ${e.message}` }]
+            };
+        }
+    }
+);
+
+server.tool(
+    "get_css_value",
+    "gets the computed CSS value of an element",
+    {
+        ...locatorSchema,
+        property: z.string().describe("CSS property name")
+    },
+    async ({ by, value, property, timeout = 10000 }) => {
+        try {
+            const driver = getDriver();
+            const locator = getLocator(by, value);
+            const element = await driver.wait(until.elementLocated(locator), timeout);
+            const cssValue = await element.getCssValue(property);
+            return {
+                content: [{ type: 'text', text: cssValue }]
+            };
+        } catch (e) {
+            return {
+                content: [{ type: 'text', text: `Error getting CSS value: ${e.message}` }]
+            };
+        }
+    }
+);
+
+server.tool(
+    "get_element_rect",
+    "gets the size and location of an element",
+    {
+        ...locatorSchema
+    },
+    async ({ by, value, timeout = 10000 }) => {
+        try {
+            const driver = getDriver();
+            const locator = getLocator(by, value);
+            const element = await driver.wait(until.elementLocated(locator), timeout);
+            const rect = await element.getRect();
+            return {
+                content: [{ type: 'text', text: JSON.stringify(rect) }]
+            };
+        } catch (e) {
+            return {
+                content: [{ type: 'text', text: `Error getting element rect: ${e.message}` }]
+            };
+        }
+    }
+);
+
 server.tool(
     "hover",
     "moves the mouse to hover over an element",
