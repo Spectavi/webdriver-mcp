@@ -13,6 +13,10 @@ A Model Context Protocol (MCP) server implementation for Selenium WebDriver.
 - Retrieve element attributes, CSS values, and geometry
 - Manage windows and frames
 - Handle browser alerts
+- Manage cookies and browser storage
+- Adjust window size (set, maximize, minimize)
+- Scroll elements into view or by offset and focus elements
+- Manage multiple sessions (list, switch, rename)
 - Perform mouse actions (hover, drag and drop)
 - Handle keyboard input
 - Take screenshots
@@ -838,6 +842,287 @@ None required
 ```
 
 
+### set_window_size
+Sets the browser window size.
+
+**Parameters:**
+- `width` (required): Window width in pixels  
+  - Type: number
+- `height` (required): Window height in pixels  
+  - Type: number
+
+**Example:**
+```json
+{
+  "tool": "set_window_size",
+  "parameters": { "width": 1024, "height": 768 }
+}
+```
+
+### maximize_window
+Maximizes the browser window.
+
+**Parameters:**
+None
+
+**Example:**
+```json
+{ "tool": "maximize_window", "parameters": {} }
+```
+
+### minimize_window
+Minimizes the browser window.
+
+**Parameters:**
+None
+
+**Example:**
+```json
+{ "tool": "minimize_window", "parameters": {} }
+```
+
+### get_cookies
+Retrieves all cookies for the current page.
+
+**Parameters:**
+None
+
+**Example:**
+```json
+{ "tool": "get_cookies", "parameters": {} }
+```
+
+### add_cookie
+Adds a cookie.
+
+**Parameters:**
+- `name` (required): Cookie name  
+  - Type: string
+- `value` (required): Cookie value  
+  - Type: string
+- `path`: Cookie path  
+  - Type: string
+- `domain`: Cookie domain  
+  - Type: string
+- `secure`: Is the cookie secure  
+  - Type: boolean
+- `httpOnly`: Is the cookie HTTP only  
+  - Type: boolean
+- `expiry`: Cookie expiry as Unix timestamp in seconds  
+  - Type: number
+
+**Example:**
+```json
+{
+  "tool": "add_cookie",
+  "parameters": { "name": "token", "value": "abc123" }
+}
+```
+
+### delete_cookie
+Deletes a cookie by name.
+
+**Parameters:**
+- `name` (required): Name of the cookie to delete  
+  - Type: string
+
+**Example:**
+```json
+{
+  "tool": "delete_cookie",
+  "parameters": { "name": "token" }
+}
+```
+
+### get_local_storage_item
+Retrieves a value from `localStorage`.
+
+**Parameters:**
+- `key` (required): Storage key  
+  - Type: string
+
+**Example:**
+```json
+{
+  "tool": "get_local_storage_item",
+  "parameters": { "key": "user" }
+}
+```
+
+### set_local_storage_item
+Sets a value in `localStorage`.
+
+**Parameters:**
+- `key` (required): Storage key  
+  - Type: string
+- `value` (required): Value to store  
+  - Type: string
+
+**Example:**
+```json
+{
+  "tool": "set_local_storage_item",
+  "parameters": { "key": "user", "value": "Bob" }
+}
+```
+
+### remove_local_storage_item
+Removes an item from `localStorage`.
+
+**Parameters:**
+- `key` (required): Storage key  
+  - Type: string
+
+**Example:**
+```json
+{
+  "tool": "remove_local_storage_item",
+  "parameters": { "key": "user" }
+}
+```
+
+### get_session_storage_item
+Retrieves a value from `sessionStorage`.
+
+**Parameters:**
+- `key` (required): Storage key  
+  - Type: string
+
+**Example:**
+```json
+{
+  "tool": "get_session_storage_item",
+  "parameters": { "key": "token" }
+}
+```
+
+### set_session_storage_item
+Sets a value in `sessionStorage`.
+
+**Parameters:**
+- `key` (required): Storage key  
+  - Type: string
+- `value` (required): Value to store  
+  - Type: string
+
+**Example:**
+```json
+{
+  "tool": "set_session_storage_item",
+  "parameters": { "key": "token", "value": "123" }
+}
+```
+
+### remove_session_storage_item
+Removes an item from `sessionStorage`.
+
+**Parameters:**
+- `key` (required): Storage key  
+  - Type: string
+
+**Example:**
+```json
+{
+  "tool": "remove_session_storage_item",
+  "parameters": { "key": "token" }
+}
+```
+
+### scroll_element_into_view
+Scrolls an element into view.
+
+**Parameters:**
+- `by` (required): Locator strategy  
+  - Type: string
+- `value` (required): Locator value  
+  - Type: string
+- `alignToTop`: Align element to top of viewport  
+  - Type: boolean
+
+**Example:**
+```json
+{
+  "tool": "scroll_element_into_view",
+  "parameters": { "by": "css", "value": "#footer" }
+}
+```
+
+### scroll_by_offset
+Scrolls the page by the given offset.
+
+**Parameters:**
+- `x` (required): Horizontal pixels to scroll  
+  - Type: number
+- `y` (required): Vertical pixels to scroll  
+  - Type: number
+
+**Example:**
+```json
+{
+  "tool": "scroll_by_offset",
+  "parameters": { "x": 0, "y": 200 }
+}
+```
+
+### focus_element
+Sets focus on an element.
+
+**Parameters:**
+- `by` (required): Locator strategy  
+  - Type: string
+- `value` (required): Locator value  
+  - Type: string
+
+**Example:**
+```json
+{
+  "tool": "focus_element",
+  "parameters": { "by": "id", "value": "username" }
+}
+```
+
+### list_sessions
+Lists active browser session IDs.
+
+**Parameters:**
+None
+
+**Example:**
+```json
+{ "tool": "list_sessions", "parameters": {} }
+```
+
+### switch_session
+Switches to a different active browser session.
+
+**Parameters:**
+- `sessionId` (required): Session ID to switch to  
+  - Type: string
+
+**Example:**
+```json
+{
+  "tool": "switch_session",
+  "parameters": { "sessionId": "chrome_123" }
+}
+```
+
+### rename_session
+Renames an existing browser session.
+
+**Parameters:**
+- `oldId` (required): Current session ID  
+  - Type: string
+- `newId` (required): New session ID  
+  - Type: string
+
+**Example:**
+```json
+{
+  "tool": "rename_session",
+  "parameters": { "oldId": "chrome_123", "newId": "primary" }
+}
+```
 ## License
 
 MIT
