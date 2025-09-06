@@ -175,6 +175,48 @@ Refreshes the current page.
 }
 ```
 
+### get_page_title
+Retrieves the current page title.
+
+**Parameters:**
+- _None_
+
+**Example:**
+```json
+{
+  "tool": "get_page_title",
+  "parameters": {}
+}
+```
+
+### get_current_url
+Retrieves the current page URL.
+
+**Parameters:**
+- _None_
+
+**Example:**
+```json
+{
+  "tool": "get_current_url",
+  "parameters": {}
+}
+```
+
+### get_page_source
+Retrieves the current page source.
+
+**Parameters:**
+- _None_
+
+**Example:**
+```json
+{
+  "tool": "get_page_source",
+  "parameters": {}
+}
+```
+
 ### find_element
 Finds an element on the page.
 
