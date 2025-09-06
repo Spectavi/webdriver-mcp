@@ -9,6 +9,8 @@ A Model Context Protocol (MCP) server implementation for Selenium WebDriver.
 - Control navigation history (back, forward, refresh)
 - Find elements using various locator strategies
 - Click, type, and interact with elements
+- Wait for element visibility, text, or attribute changes
+- Retrieve element attributes, CSS values, and geometry
 - Perform mouse actions (hover, drag and drop)
 - Handle keyboard input
 - Take screenshots
@@ -93,7 +95,7 @@ Launches a browser session.
 **Parameters:**
 - `browser` (required): Browser to launch
   - Type: string
-  - Enum: ["chrome", "firefox"]
+  - Enum: ["chrome", "firefox", "edge"]
 - `options`: Browser configuration options
   - Type: object
   - Properties:
@@ -313,6 +315,196 @@ Gets the text() of an element.
   "parameters": {
     "by": "css",
     "value": ".message"
+  }
+}
+```
+
+### wait_for_element_visible
+Waits until an element is visible.
+
+**Parameters:**
+- `by` (required): Locator strategy
+  - Type: string
+  - Enum: ["id", "css", "xpath", "name", "tag", "class"]
+- `value` (required): Value for the locator strategy
+  - Type: string
+- `timeout`: Maximum time to wait for element in milliseconds
+  - Type: number
+  - Default: 10000
+
+**Example:**
+```json
+{
+  "tool": "wait_for_element_visible",
+  "parameters": {
+    "by": "css",
+    "value": ".loading"
+  }
+}
+```
+
+### wait_for_element_not_visible
+Waits until an element is not visible.
+
+**Parameters:**
+- `by` (required): Locator strategy
+  - Type: string
+  - Enum: ["id", "css", "xpath", "name", "tag", "class"]
+- `value` (required): Value for the locator strategy
+  - Type: string
+- `timeout`: Maximum time to wait for element in milliseconds
+  - Type: number
+  - Default: 10000
+
+**Example:**
+```json
+{
+  "tool": "wait_for_element_not_visible",
+  "parameters": {
+    "by": "id",
+    "value": "spinner"
+  }
+}
+```
+
+### wait_for_text
+Waits until an element's text matches or contains a value.
+
+**Parameters:**
+- `by` (required): Locator strategy
+  - Type: string
+  - Enum: ["id", "css", "xpath", "name", "tag", "class"]
+- `value` (required): Value for the locator strategy
+  - Type: string
+- `text` (required): Text to wait for
+  - Type: string
+- `contains`: Whether to match partial text
+  - Type: boolean
+  - Default: false
+- `timeout`: Maximum time to wait for text in milliseconds
+  - Type: number
+  - Default: 10000
+
+**Example:**
+```json
+{
+  "tool": "wait_for_text",
+  "parameters": {
+    "by": "css",
+    "value": ".message",
+    "text": "Loaded",
+    "contains": true
+  }
+}
+```
+
+### wait_for_attribute
+Waits until an element's attribute has a given value.
+
+**Parameters:**
+- `by` (required): Locator strategy
+  - Type: string
+  - Enum: ["id", "css", "xpath", "name", "tag", "class"]
+- `value` (required): Value for the locator strategy
+  - Type: string
+- `attribute` (required): Attribute name
+  - Type: string
+- `expected` (required): Expected attribute value
+  - Type: string
+- `contains`: Whether to match partial value
+  - Type: boolean
+  - Default: false
+- `timeout`: Maximum time to wait for attribute in milliseconds
+  - Type: number
+  - Default: 10000
+
+**Example:**
+```json
+{
+  "tool": "wait_for_attribute",
+  "parameters": {
+    "by": "css",
+    "value": ".status",
+    "attribute": "data-state",
+    "expected": "ready"
+  }
+}
+```
+
+### get_element_attribute
+Gets an attribute value of an element.
+
+**Parameters:**
+- `by` (required): Locator strategy
+  - Type: string
+  - Enum: ["id", "css", "xpath", "name", "tag", "class"]
+- `value` (required): Value for the locator strategy
+  - Type: string
+- `attribute` (required): Attribute name to retrieve
+  - Type: string
+- `timeout`: Maximum time to wait for element in milliseconds
+  - Type: number
+  - Default: 10000
+
+**Example:**
+```json
+{
+  "tool": "get_element_attribute",
+  "parameters": {
+    "by": "css",
+    "value": "#username",
+    "attribute": "placeholder"
+  }
+}
+```
+
+### get_css_value
+Gets the computed CSS value of an element.
+
+**Parameters:**
+- `by` (required): Locator strategy
+  - Type: string
+  - Enum: ["id", "css", "xpath", "name", "tag", "class"]
+- `value` (required): Value for the locator strategy
+  - Type: string
+- `property` (required): CSS property name
+  - Type: string
+- `timeout`: Maximum time to wait for element in milliseconds
+  - Type: number
+  - Default: 10000
+
+**Example:**
+```json
+{
+  "tool": "get_css_value",
+  "parameters": {
+    "by": "css",
+    "value": ".button",
+    "property": "color"
+  }
+}
+```
+
+### get_element_rect
+Gets the size and location of an element.
+
+**Parameters:**
+- `by` (required): Locator strategy
+  - Type: string
+  - Enum: ["id", "css", "xpath", "name", "tag", "class"]
+- `value` (required): Value for the locator strategy
+  - Type: string
+- `timeout`: Maximum time to wait for element in milliseconds
+  - Type: number
+  - Default: 10000
+
+**Example:**
+```json
+{
+  "tool": "get_element_rect",
+  "parameters": {
+    "by": "css",
+    "value": "#logo"
   }
 }
 ```
