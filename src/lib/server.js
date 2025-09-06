@@ -1362,6 +1362,11 @@ async function cleanup() {
 process.on('SIGTERM', cleanup);
 process.on('SIGINT', cleanup);
 
-// Start the server
-const transport = new StdioServerTransport();
-await server.connect(transport);
+// Exported for testing
+export { getLocator, server, state, cleanup };
+
+// Start the server only when executed directly
+if (import.meta.url === `file://${process.argv[1]}`) {
+    const transport = new StdioServerTransport();
+    await server.connect(transport);
+}
