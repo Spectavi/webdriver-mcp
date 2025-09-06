@@ -1,7 +1,7 @@
 # TODOs
 
 - [x] Navigation control (back, forward, refresh)
-- [ ] Page metadata retrieval (title, current URL, page source)
+- [x] Page metadata retrieval (title, current URL, page source)
 - [ ] Waiting and visibility checks (wait for element visible/invisible, wait for text/attribute)
 - [ ] Element metadata (get attribute, CSS value, size/location)
 - [ ] Window/frame management (switch to frame, parent frame, window; list windows)

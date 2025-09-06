@@ -207,6 +207,64 @@ server.tool(
     }
 );
 
+// Page Metadata Tools
+server.tool(
+    "get_page_title",
+    "retrieves the current page title",
+    {},
+    async () => {
+        try {
+            const driver = getDriver();
+            const title = await driver.getTitle();
+            return {
+                content: [{ type: 'text', text: title }]
+            };
+        } catch (e) {
+            return {
+                content: [{ type: 'text', text: `Error getting page title: ${e.message}` }]
+            };
+        }
+    }
+);
+
+server.tool(
+    "get_current_url",
+    "retrieves the current page URL",
+    {},
+    async () => {
+        try {
+            const driver = getDriver();
+            const url = await driver.getCurrentUrl();
+            return {
+                content: [{ type: 'text', text: url }]
+            };
+        } catch (e) {
+            return {
+                content: [{ type: 'text', text: `Error getting current URL: ${e.message}` }]
+            };
+        }
+    }
+);
+
+server.tool(
+    "get_page_source",
+    "retrieves the current page source",
+    {},
+    async () => {
+        try {
+            const driver = getDriver();
+            const source = await driver.getPageSource();
+            return {
+                content: [{ type: 'text', text: source }]
+            };
+        } catch (e) {
+            return {
+                content: [{ type: 'text', text: `Error getting page source: ${e.message}` }]
+            };
+        }
+    }
+);
+
 // Element Interaction Tools
 server.tool(
     "find_element",
