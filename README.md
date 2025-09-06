@@ -6,6 +6,7 @@ A Model Context Protocol (MCP) server implementation for Selenium WebDriver.
 
 - Start browser sessions with customizable options
 - Navigate to URLs
+- Control navigation history (back, forward, refresh)
 - Find elements using various locator strategies
 - Click, type, and interact with elements
 - Perform mouse actions (hover, drag and drop)
@@ -129,6 +130,48 @@ Navigates to a URL.
   "parameters": {
     "url": "https://www.example.com"
   }
+}
+```
+
+### go_back
+Navigates back in browser history.
+
+**Parameters:**
+- _None_
+
+**Example:**
+```json
+{
+  "tool": "go_back",
+  "parameters": {}
+}
+```
+
+### go_forward
+Navigates forward in browser history.
+
+**Parameters:**
+- _None_
+
+**Example:**
+```json
+{
+  "tool": "go_forward",
+  "parameters": {}
+}
+```
+
+### refresh_page
+Refreshes the current page.
+
+**Parameters:**
+- _None_
+
+**Example:**
+```json
+{
+  "tool": "refresh_page",
+  "parameters": {}
 }
 ```
 
