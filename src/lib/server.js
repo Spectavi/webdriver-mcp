@@ -150,6 +150,63 @@ server.tool(
     }
 );
 
+server.tool(
+    "go_back",
+    "navigates back in browser history",
+    {},
+    async () => {
+        try {
+            const driver = getDriver();
+            await driver.navigate().back();
+            return {
+                content: [{ type: 'text', text: 'Navigated back' }]
+            };
+        } catch (e) {
+            return {
+                content: [{ type: 'text', text: `Error navigating back: ${e.message}` }]
+            };
+        }
+    }
+);
+
+server.tool(
+    "go_forward",
+    "navigates forward in browser history",
+    {},
+    async () => {
+        try {
+            const driver = getDriver();
+            await driver.navigate().forward();
+            return {
+                content: [{ type: 'text', text: 'Navigated forward' }]
+            };
+        } catch (e) {
+            return {
+                content: [{ type: 'text', text: `Error navigating forward: ${e.message}` }]
+            };
+        }
+    }
+);
+
+server.tool(
+    "refresh_page",
+    "refreshes the current page",
+    {},
+    async () => {
+        try {
+            const driver = getDriver();
+            await driver.navigate().refresh();
+            return {
+                content: [{ type: 'text', text: 'Page refreshed' }]
+            };
+        } catch (e) {
+            return {
+                content: [{ type: 'text', text: `Error refreshing page: ${e.message}` }]
+            };
+        }
+    }
+);
+
 // Element Interaction Tools
 server.tool(
     "find_element",
