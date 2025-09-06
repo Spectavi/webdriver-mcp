@@ -11,6 +11,8 @@ A Model Context Protocol (MCP) server implementation for Selenium WebDriver.
 - Click, type, and interact with elements
 - Wait for element visibility, text, or attribute changes
 - Retrieve element attributes, CSS values, and geometry
+- Manage windows and frames
+- Handle browser alerts
 - Perform mouse actions (hover, drag and drop)
 - Handle keyboard input
 - Take screenshots
@@ -652,6 +654,134 @@ Uploads a file using a file input element.
     "by": "id",
     "value": "file-input",
     "filePath": "/path/to/file.pdf"
+  }
+}
+```
+
+### list_windows
+Lists all available window handles.
+
+**Parameters:**
+None
+
+**Example:**
+```json
+{
+  "tool": "list_windows",
+  "parameters": {}
+}
+```
+
+### switch_to_window
+Switches to a window by handle.
+
+**Parameters:**
+- `handle` (required): Window handle to switch to
+  - Type: string
+
+**Example:**
+```json
+{
+  "tool": "switch_to_window",
+  "parameters": {
+    "handle": "CDwindow-123"
+  }
+}
+```
+
+### switch_to_frame
+Switches to a frame located by a locator.
+
+**Parameters:**
+- `by` (required): Locator strategy
+  - Type: string
+  - Enum: ["id", "css", "xpath", "name", "tag", "class"]
+- `value` (required): Value for the locator strategy
+  - Type: string
+- `timeout`: Maximum time to wait for element in milliseconds
+  - Type: number
+  - Default: 10000
+
+**Example:**
+```json
+{
+  "tool": "switch_to_frame",
+  "parameters": {
+    "by": "css",
+    "value": "#frameId"
+  }
+}
+```
+
+### switch_to_parent_frame
+Switches to the parent frame.
+
+**Parameters:**
+None
+
+**Example:**
+```json
+{
+  "tool": "switch_to_parent_frame",
+  "parameters": {}
+}
+```
+
+### get_alert_text
+Retrieves the text of the currently displayed alert.
+
+**Parameters:**
+None
+
+**Example:**
+```json
+{
+  "tool": "get_alert_text",
+  "parameters": {}
+}
+```
+
+### accept_alert
+Accepts the currently displayed alert.
+
+**Parameters:**
+None
+
+**Example:**
+```json
+{
+  "tool": "accept_alert",
+  "parameters": {}
+}
+```
+
+### dismiss_alert
+Dismisses the currently displayed alert.
+
+**Parameters:**
+None
+
+**Example:**
+```json
+{
+  "tool": "dismiss_alert",
+  "parameters": {}
+}
+```
+
+### send_alert_text
+Sends text input to a prompt alert.
+
+**Parameters:**
+- `text` (required): Text to send to the alert
+  - Type: string
+
+**Example:**
+```json
+{
+  "tool": "send_alert_text",
+  "parameters": {
+    "text": "hello"
   }
 }
 ```

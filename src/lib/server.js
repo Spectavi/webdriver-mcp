@@ -682,6 +682,172 @@ server.tool(
     }
 );
 
+// Window and Frame Management Tools
+server.tool(
+    "list_windows",
+    "lists all available window handles",
+    {},
+    async () => {
+        try {
+            const driver = getDriver();
+            const handles = await driver.getAllWindowHandles();
+            return {
+                content: [{ type: 'text', text: JSON.stringify(handles) }]
+            };
+        } catch (e) {
+            return {
+                content: [{ type: 'text', text: `Error listing windows: ${e.message}` }]
+            };
+        }
+    }
+);
+
+server.tool(
+    "switch_to_window",
+    "switches to a window by handle",
+    {
+        handle: z.string().describe("Window handle to switch to")
+    },
+    async ({ handle }) => {
+        try {
+            const driver = getDriver();
+            await driver.switchTo().window(handle);
+            return {
+                content: [{ type: 'text', text: `Switched to window ${handle}` }]
+            };
+        } catch (e) {
+            return {
+                content: [{ type: 'text', text: `Error switching window: ${e.message}` }]
+            };
+        }
+    }
+);
+
+server.tool(
+    "switch_to_frame",
+    "switches to a frame",
+    {
+        ...locatorSchema
+    },
+    async ({ by, value, timeout = 10000 }) => {
+        try {
+            const driver = getDriver();
+            const locator = getLocator(by, value);
+            const element = await driver.wait(until.elementLocated(locator), timeout);
+            await driver.switchTo().frame(element);
+            return {
+                content: [{ type: 'text', text: 'Switched to frame' }]
+            };
+        } catch (e) {
+            return {
+                content: [{ type: 'text', text: `Error switching to frame: ${e.message}` }]
+            };
+        }
+    }
+);
+
+server.tool(
+    "switch_to_parent_frame",
+    "switches to the parent frame",
+    {},
+    async () => {
+        try {
+            const driver = getDriver();
+            await driver.switchTo().parentFrame();
+            return {
+                content: [{ type: 'text', text: 'Switched to parent frame' }]
+            };
+        } catch (e) {
+            return {
+                content: [{ type: 'text', text: `Error switching to parent frame: ${e.message}` }]
+            };
+        }
+    }
+);
+
+// Alert Handling Tools
+server.tool(
+    "get_alert_text",
+    "retrieves the text of the currently displayed alert",
+    {},
+    async () => {
+        try {
+            const driver = getDriver();
+            const alert = await driver.switchTo().alert();
+            const text = await alert.getText();
+            return {
+                content: [{ type: 'text', text }]
+            };
+        } catch (e) {
+            return {
+                content: [{ type: 'text', text: `Error getting alert text: ${e.message}` }]
+            };
+        }
+    }
+);
+
+server.tool(
+    "accept_alert",
+    "accepts the currently displayed alert",
+    {},
+    async () => {
+        try {
+            const driver = getDriver();
+            const alert = await driver.switchTo().alert();
+            await alert.accept();
+            return {
+                content: [{ type: 'text', text: 'Alert accepted' }]
+            };
+        } catch (e) {
+            return {
+                content: [{ type: 'text', text: `Error accepting alert: ${e.message}` }]
+            };
+        }
+    }
+);
+
+server.tool(
+    "dismiss_alert",
+    "dismisses the currently displayed alert",
+    {},
+    async () => {
+        try {
+            const driver = getDriver();
+            const alert = await driver.switchTo().alert();
+            await alert.dismiss();
+            return {
+                content: [{ type: 'text', text: 'Alert dismissed' }]
+            };
+        } catch (e) {
+            return {
+                content: [{ type: 'text', text: `Error dismissing alert: ${e.message}` }]
+            };
+        }
+    }
+);
+
+server.tool(
+    "send_alert_text",
+    "sends text to a prompt alert",
+    {
+        text: z.string().describe("Text to send to the alert")
+    },
+    async ({ text }) => {
+        try {
+            const driver = getDriver();
+            const alert = await driver.switchTo().alert();
+            await alert.sendKeys(text);
+            return {
+                content: [{ type: 'text', text: `Sent text to alert: ${text}` }]
+            };
+        } catch (e) {
+            return {
+                content: [{ type: 'text', text: `Error sending alert text: ${e.message}` }]
+            };
+        }
+    }
+);
+
 server.tool(
     "take_screenshot",
     "captures a screenshot of the current page",
