@@ -21,6 +21,8 @@ A Model Context Protocol (MCP) server implementation for Selenium WebDriver.
 - Handle keyboard input
 - Take screenshots
 - Record video of the browser session
+- Retrieve console, network, and performance logs
+- Assert element presence, text, and attributes
 - Upload files
 - Support for headless mode
 - Execute JavaScript
@@ -848,6 +850,122 @@ Stops the current browser recording.
 {
   "tool": "stop_recording",
   "parameters": {}
+}
+```
+
+### get_console_logs
+Retrieves browser console logs.
+
+**Parameters:**
+- _None_
+
+**Example:**
+```json
+{
+  "tool": "get_console_logs",
+  "parameters": {}
+}
+```
+
+### get_network_logs
+Retrieves network logs.
+
+**Parameters:**
+- _None_
+
+**Example:**
+```json
+{
+  "tool": "get_network_logs",
+  "parameters": {}
+}
+```
+
+### get_performance_metrics
+Retrieves performance timing metrics.
+
+**Parameters:**
+- _None_
+
+**Example:**
+```json
+{
+  "tool": "get_performance_metrics",
+  "parameters": {}
+}
+```
+
+### assert_element_present
+Verifies that an element is present on the page.
+
+**Parameters:**
+- `by` (required): Locator strategy
+  - Type: string
+  - Enum: ["id", "css", "xpath", "name", "tag", "class"]
+- `value` (required): Value for the locator strategy
+  - Type: string
+- `timeout`: Maximum time to wait for element in milliseconds
+  - Type: number
+  - Default: 10000
+
+**Example:**
+```json
+{
+  "tool": "assert_element_present",
+  "parameters": { "by": "css", "value": "#submit" }
+}
+```
+
+### assert_element_text
+Verifies that an element has the expected text.
+
+**Parameters:**
+- `by` (required): Locator strategy
+  - Type: string
+  - Enum: ["id", "css", "xpath", "name", "tag", "class"]
+- `value` (required): Value for the locator strategy
+  - Type: string
+- `expected` (required): Expected text value
+  - Type: string
+- `timeout`: Maximum time to wait for element in milliseconds
+  - Type: number
+  - Default: 10000
+
+**Example:**
+```json
+{
+  "tool": "assert_element_text",
+  "parameters": { "by": "id", "value": "message", "expected": "Hello" }
+}
+```
+
+### assert_element_attribute
+Verifies that an element attribute has the expected value.
+
+**Parameters:**
+- `by` (required): Locator strategy
+  - Type: string
+  - Enum: ["id", "css", "xpath", "name", "tag", "class"]
+- `value` (required): Value for the locator strategy
+  - Type: string
+- `attribute` (required): Attribute name
+  - Type: string
+- `expected` (required): Expected attribute value
+  - Type: string
+- `timeout`: Maximum time to wait for element in milliseconds
+  - Type: number
+  - Default: 10000
+
+**Example:**
+```json
+{
+  "tool": "assert_element_attribute",
+  "parameters": {
+    "by": "id",
+    "value": "username",
+    "attribute": "type",
+    "expected": "text"
+  }
 }
 ```
 

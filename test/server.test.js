@@ -16,6 +16,12 @@ test('server registers start_browser tool', () => {
   assert.ok(server._registeredTools['start_browser']);
 });
 
+test('server registers logging and assertion tools', () => {
+  ['get_console_logs', 'get_network_logs', 'get_performance_metrics',
+   'assert_element_present', 'assert_element_text', 'assert_element_attribute']
+    .forEach(tool => assert.ok(server._registeredTools[tool]));
+});
+
 test('cleanup clears state and exits', async () => {
   let exitCode;
   const originalExit = process.exit;

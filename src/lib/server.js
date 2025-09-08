@@ -1330,6 +1330,149 @@ server.tool(
     }
 );
 
+// Logging and Diagnostics Tools
+server.tool(
+    "get_console_logs",
+    "retrieves browser console logs",
+    {},
+    async () => {
+        try {
+            const driver = getDriver();
+            const logs = await driver.manage().logs().get('browser');
+            return {
+                content: [{ type: 'text', text: JSON.stringify(logs, null, 2) }]
+            };
+        } catch (e) {
+            return {
+                content: [{ type: 'text', text: `Error retrieving console logs: ${e.message}` }]
+            };
+        }
+    }
+);
+
+server.tool(
+    "get_network_logs",
+    "retrieves network logs",
+    {},
+    async () => {
+        try {
+            const driver = getDriver();
+            const logs = await driver.manage().logs().get('performance');
+            const networkEvents = logs
+                .map(entry => {
+                    try {
+                        return JSON.parse(entry.message).message;
+                    } catch {
+                        return null;
+                    }
+                })
+                .filter(msg => msg && msg.method && msg.method.startsWith('Network.'));
+            return {
+                content: [{ type: 'text', text: JSON.stringify(networkEvents, null, 2) }]
+            };
+        } catch (e) {
+            return {
+                content: [{ type: 'text', text: `Error retrieving network logs: ${e.message}` }]
+            };
+        }
+    }
+);
+
+server.tool(
+    "get_performance_metrics",
+    "retrieves performance timing metrics",
+    {},
+    async () => {
+        try {
+            const driver = getDriver();
+            const timing = await driver.executeScript('return window.performance.timing');
+            return {
+                content: [{ type: 'text', text: JSON.stringify(timing, null, 2) }]
+            };
+        } catch (e) {
+            return {
+                content: [{ type: 'text', text: `Error retrieving performance metrics: ${e.message}` }]
+            };
+        }
+    }
+);
+
+// Assertion Tools
+server.tool(
+    "assert_element_present",
+    "verifies that an element is present on the page",
+    {
+        ...locatorSchema
+    },
+    async ({ by, value, timeout = 10000 }) => {
+        try {
+            const driver = getDriver();
+            const locator = getLocator(by, value);
+            await driver.wait(until.elementLocated(locator), timeout);
+            return {
+                content: [{ type: 'text', text: 'Element is present' }]
+            };
+        } catch (e) {
+            return {
+                content: [{ type: 'text', text: `Assertion failed: ${e.message}` }]
+            };
+        }
+    }
+);
+
+server.tool(
+    "assert_element_text",
+    "verifies that an element has expected text",
+    {
+        ...locatorSchema,
+        expected: z.string().describe("Expected text value")
+    },
+    async ({ by, value, expected, timeout = 10000 }) => {
+        try {
+            const driver = getDriver();
+            const locator = getLocator(by, value);
+            const element = await driver.wait(until.elementLocated(locator), timeout);
+            const text = await element.getText();
+            if (text === expected) {
+                return { content: [{ type: 'text', text: 'Text assertion passed' }] };
+            } else {
+                throw new Error(`Expected "${expected}", but found "${text}"`);
+            }
+        } catch (e) {
+            return {
+                content: [{ type: 'text', text: `Assertion failed: ${e.message}` }]
+            };
+        }
+    }
+);
+
+server.tool(
+    "assert_element_attribute",
+    "verifies that an element attribute has expected value",
+    {
+        ...locatorSchema,
+        attribute: z.string().describe("Attribute name"),
+        expected: z.string().describe("Expected attribute value")
+    },
+    async ({ by, value, attribute, expected, timeout = 10000 }) => {
+        try {
+            const driver = getDriver();
+            const locator = getLocator(by, value);
+            const element = await driver.wait(until.elementLocated(locator), timeout);
+            const attrValue = await element.getAttribute(attribute);
+            if (attrValue === expected) {
+                return { content: [{ type: 'text', text: 'Attribute assertion passed' }] };
+            } else {
+                throw new Error(`Expected "${attribute}" to be "${expected}", but found "${attrValue}"`);
+            }
+        } catch (e) {
+            return {
+                content: [{ type: 'text', text: `Assertion failed: ${e.message}` }]
+            };
+        }
+    }
+);
+
 server.tool(
     "take_screenshot",
     "captures a screenshot of the current page",
