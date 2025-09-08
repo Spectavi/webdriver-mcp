@@ -31,12 +31,19 @@ A Model Context Protocol (MCP) server implementation for Selenium WebDriver.
 - Firefox
 - MS Edge
 
+### Add to Claude Code
 
-### Option 2: Add manually to desktop or CLI
+Run this inside of each directory you're using Claude Code in:
+
+```bash
+claude mcp add webdriver -- npx -y @spectavi/webdriver-mcp@latest
+```
+
+### Add manually to desktop or CLI
 
 * Name: `WebDriver MCP`
 * Description: `Describes WebDriver API to AI agents.`
-* Command: `npx -y @spectavi/webdriver-mcp`
+* Command: `npx -y @spectavi/webdriver-mcp@latest`
 
 ## Use with other MCP clients (e.g. Claude Desktop, etc)
 ```json
