@@ -12,5 +12,5 @@
 - [x] Session utilities (list active sessions, switch sessions, rename sessions)
 - [x] Logging and diagnostics (retrieve console logs, network logs, performance metrics)
 - [x] Assertions or checks (verify element presence, text, attribute value)
-- [ ] Clipboard operations (copy/paste text via clipboard simulation)
-- [ ] Advanced actions (multi-step key chords, mouse wheel events, file downloads)
+- [x] Clipboard operations (copy/paste text via clipboard simulation)
+- [x] Advanced actions (multi-step key chords, mouse wheel events, file downloads)

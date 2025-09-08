@@ -22,6 +22,11 @@ test('server registers logging and assertion tools', () => {
     .forEach(tool => assert.ok(server._registeredTools[tool]));
 });
 
+test('server registers clipboard and advanced action tools', () => {
+  ['copy_to_clipboard', 'paste_from_clipboard', 'key_chord', 'mouse_wheel', 'download_file']
+    .forEach(tool => assert.ok(server._registeredTools[tool]));
+});
+
 test('cleanup clears state and exits', async () => {
   let exitCode;
   const originalExit = process.exit;
