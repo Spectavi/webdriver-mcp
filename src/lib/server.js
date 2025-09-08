@@ -8,6 +8,7 @@ const { Builder, By, Key, until, Actions } = pkg;
 import { Options as ChromeOptions } from 'selenium-webdriver/chrome.js';
 import { Options as FirefoxOptions } from 'selenium-webdriver/firefox.js';
 import { Options as EdgeOptions } from 'selenium-webdriver/edge.js';
+import { spawn } from 'child_process';
 
 
 // Create an MCP server
@@ -19,7 +20,8 @@ const server = new McpServer({
 // Server state
 const state = {
     drivers: new Map(),
-    currentSession: null
+    currentSession: null,
+    recordings: new Map()
 };
 
 // Helper functions
@@ -1250,6 +1252,79 @@ server.tool(
         } catch (e) {
             return {
                 content: [{ type: 'text', text: `Error renaming session: ${e.message}` }]
+            };
+        }
+    }
+);
+
+server.tool(
+    "start_recording",
+    "starts recording the browser session",
+    {
+        outputPath: z.string().describe("File path to save the recording"),
+        frameRate: z.number().optional().describe("Frames per second")
+    },
+    async ({ outputPath, frameRate = 30 }) => {
+        try {
+            const driver = getDriver();
+            const cdp = await driver.createCDPSession();
+            let ffmpegPath = 'ffmpeg';
+            try {
+                ffmpegPath = (await import('ffmpeg-static')).default || ffmpegPath;
+            } catch {}
+            const ffmpeg = spawn(
+                ffmpegPath,
+                ['-y', '-f', 'image2pipe', '-framerate', String(frameRate), '-i', '-', outputPath]
+            );
+
+            cdp.on('Page.screencastFrame', async (frame) => {
+                ffmpeg.stdin.write(Buffer.from(frame.data, 'base64'));
+                await cdp.send('Page.screencastFrameAck', { sessionId: frame.sessionId });
+            });
+
+            await cdp.send('Page.startScreencast', { format: 'png' });
+            state.recordings.set(state.currentSession, { cdp, ffmpeg, outputPath });
+
+            return {
+                content: [{ type: 'text', text: `Recording started: ${outputPath}` }]
+            };
+        } catch (e) {
+            return {
+                content: [{ type: 'text', text: `Error starting recording: ${e.message}` }]
+            };
+        }
+    }
+);
+
+server.tool(
+    "stop_recording",
+    "stops the active recording",
+    {},
+    async () => {
+        try {
+            const rec = state.recordings.get(state.currentSession);
+            if (!rec) {
+                throw new Error('No active recording');
+            }
+            const { cdp, ffmpeg, outputPath } = rec;
+            await cdp.send('Page.stopScreencast');
+            ffmpeg.stdin.end();
+
+            await new Promise((resolve, reject) => {
+                ffmpeg.on('close', code => {
+                    if (code === 0) resolve();
+                    else reject(new Error(`ffmpeg exited with code ${code}`));
+                });
+            });
+
+            state.recordings.delete(state.currentSession);
+
+            return {
+                content: [{ type: 'text', text: `Recording saved to ${outputPath}` }]
+            };
+        } catch (e) {
+            return {
+                content: [{ type: 'text', text: `Error stopping recording: ${e.message}` }]
             };
         }
     }

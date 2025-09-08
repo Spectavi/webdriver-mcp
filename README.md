@@ -20,6 +20,7 @@ A Model Context Protocol (MCP) server implementation for Selenium WebDriver.
 - Perform mouse actions (hover, drag and drop)
 - Handle keyboard input
 - Take screenshots
+- Record video of the browser session
 - Upload files
 - Support for headless mode
 - Execute JavaScript
@@ -804,6 +805,42 @@ Captures a screenshot of the current page.
   "parameters": {
     "outputPath": "/path/to/screenshot.png"
   }
+}
+```
+
+### start_recording
+Starts recording the browser session to a video file.
+
+This tool uses a bundled `ffmpeg` binary via the [`ffmpeg-static`](https://www.npmjs.com/package/ffmpeg-static) dependency, so no system installation is required.
+
+**Parameters:**
+- `outputPath` (required): Path where to save the video file.
+  - Type: string
+- `frameRate` (optional): Frames per second for the recording.
+  - Type: number
+
+**Example:**
+```json
+{
+  "tool": "start_recording",
+  "parameters": {
+    "outputPath": "/path/to/recording.webm",
+    "frameRate": 30
+  }
+}
+```
+
+### stop_recording
+Stops the current browser recording.
+
+**Parameters:**
+- _None_
+
+**Example:**
+```json
+{
+  "tool": "stop_recording",
+  "parameters": {}
 }
 ```
 
