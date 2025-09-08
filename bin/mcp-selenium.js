@@ -9,6 +9,9 @@ const __dirname = dirname(__filename);
 
 const serverPath = resolve(__dirname, '../src/lib/server.js');
 
+console.error('Starting webdriver-mcp server...');
+console.error('Server path:', serverPath);
+
 // Start the server
 const child = spawn('node', [serverPath], {
     stdio: 'inherit'
@@ -17,6 +20,13 @@ const child = spawn('node', [serverPath], {
 child.on('error', (error) => {
     console.error(`Error starting server: ${error.message}`);
     process.exit(1);
+});
+
+child.on('exit', (code, signal) => {
+    console.error(`Server exited with code ${code} and signal ${signal}`);
+    if (code !== 0) {
+        process.exit(code);
+    }
 });
 
 // Handle process termination
