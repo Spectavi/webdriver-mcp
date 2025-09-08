@@ -661,6 +661,133 @@ server.tool(
 );
 
 server.tool(
+    "copy_to_clipboard",
+    "copies provided text to the browser clipboard",
+    {
+        text: z.string().describe("Text to copy to the clipboard")
+    },
+    async ({ text }) => {
+        try {
+            const driver = getDriver();
+            await driver.executeScript('navigator.clipboard.writeText(arguments[0]);', text);
+            return {
+                content: [{ type: 'text', text: 'Text copied to clipboard' }]
+            };
+        } catch (e) {
+            return {
+                content: [{ type: 'text', text: `Error copying to clipboard: ${e.message}` }]
+            };
+        }
+    }
+);
+
+server.tool(
+    "paste_from_clipboard",
+    "pastes text from the clipboard into an element",
+    {
+        ...locatorSchema
+    },
+    async ({ by, value, timeout = 10000 }) => {
+        try {
+            const driver = getDriver();
+            const locator = getLocator(by, value);
+            const element = await driver.wait(until.elementLocated(locator), timeout);
+            await element.click();
+            const text = await driver.executeScript('return navigator.clipboard.readText();');
+            await element.sendKeys(text);
+            return {
+                content: [{ type: 'text', text: 'Text pasted from clipboard' }]
+            };
+        } catch (e) {
+            return {
+                content: [{ type: 'text', text: `Error pasting from clipboard: ${e.message}` }]
+            };
+        }
+    }
+);
+
+server.tool(
+    "key_chord",
+    "performs a multi-step key chord",
+    {
+        keys: z.array(z.string()).min(2).describe("Array of keys for the chord in order")
+    },
+    async ({ keys }) => {
+        try {
+            const driver = getDriver();
+            const actions = driver.actions({ bridge: true });
+            for (let i = 0; i < keys.length - 1; i++) {
+                actions.keyDown(keys[i]);
+            }
+            actions.sendKeys(keys[keys.length - 1]);
+            for (let i = keys.length - 2; i >= 0; i--) {
+                actions.keyUp(keys[i]);
+            }
+            await actions.perform();
+            return {
+                content: [{ type: 'text', text: `Key chord ${keys.join('+')} performed` }]
+            };
+        } catch (e) {
+            return {
+                content: [{ type: 'text', text: `Error performing key chord: ${e.message}` }]
+            };
+        }
+    }
+);
+
+server.tool(
+    "mouse_wheel",
+    "simulates mouse wheel scrolling",
+    {
+        deltaX: z.number().optional().describe("Horizontal scroll amount"),
+        deltaY: z.number().describe("Vertical scroll amount")
+    },
+    async ({ deltaX = 0, deltaY }) => {
+        try {
+            const driver = getDriver();
+            try {
+                const actions = driver.actions({ bridge: true });
+                await actions.scroll(0, 0, deltaX, deltaY).perform();
+            } catch {
+                await driver.executeScript('window.scrollBy(arguments[0], arguments[1]);', deltaX, deltaY);
+            }
+            return {
+                content: [{ type: 'text', text: `Scrolled by wheel ${deltaX},${deltaY}` }]
+            };
+        } catch (e) {
+            return {
+                content: [{ type: 'text', text: `Error performing mouse wheel: ${e.message}` }]
+            };
+        }
+    }
+);
+
+server.tool(
+    "download_file",
+    "downloads a file from a URL to a local path",
+    {
+        url: z.string().describe("URL of the file"),
+        outputPath: z.string().describe("Path on disk to save the file")
+    },
+    async ({ url, outputPath }) => {
+        try {
+            const res = await fetch(url);
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            const buffer = Buffer.from(await res.arrayBuffer());
+            const fs = await import('fs');
+            await fs.promises.writeFile(outputPath, buffer);
+            return {
+                content: [{ type: 'text', text: `File downloaded to ${outputPath}` }]
+            };
+        } catch (e) {
+            return {
+                content: [{ type: 'text', text: `Error downloading file: ${e.message}` }]
+            };
+        }
+    }
+);
+
+server.tool(
     "upload_file",
     "uploads a file using a file input element",
     {

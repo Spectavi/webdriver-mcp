@@ -23,6 +23,7 @@ A Model Context Protocol (MCP) server implementation for Selenium WebDriver.
 - Record video of the browser session
 - Retrieve console, network, and performance logs
 - Assert element presence, text, and attributes
+- Perform clipboard operations, key chords, mouse wheel scrolling, and file downloads
 - Upload files
 - Support for headless mode
 - Execute JavaScript
@@ -638,9 +639,99 @@ Simulates pressing a keyboard key.
 **Example:**
 ```json
 {
-  "tool": "press_key",
+"tool": "press_key",
   "parameters": {
     "key": "Enter"
+  }
+}
+```
+
+### copy_to_clipboard
+Copies provided text to the browser clipboard.
+
+**Parameters:**
+- `text` (required): Text to copy to the clipboard
+  - Type: string
+
+**Example:**
+```json
+{
+  "tool": "copy_to_clipboard",
+  "parameters": { "text": "hello" }
+}
+```
+
+### paste_from_clipboard
+Pastes text from the clipboard into an element.
+
+**Parameters:**
+- `by` (required): Locator strategy
+  - Type: string
+  - Enum: ["id", "css", "xpath", "name", "tag", "class"]
+- `value` (required): Value for the locator strategy
+  - Type: string
+- `timeout`: Maximum time to wait for element in milliseconds
+  - Type: number
+  - Default: 10000
+
+**Example:**
+```json
+{
+  "tool": "paste_from_clipboard",
+  "parameters": { "by": "css", "value": "#input" }
+}
+```
+
+### key_chord
+Performs a multi-step key chord.
+
+**Parameters:**
+- `keys` (required): Array of keys for the chord in order
+  - Type: array of strings
+  - MinItems: 2
+
+**Example:**
+```json
+{
+  "tool": "key_chord",
+  "parameters": { "keys": ["Control", "Shift", "P"] }
+}
+```
+
+### mouse_wheel
+Simulates mouse wheel scrolling.
+
+**Parameters:**
+- `deltaY` (required): Vertical scroll amount
+  - Type: number
+- `deltaX`: Horizontal scroll amount
+  - Type: number
+  - Default: 0
+
+**Example:**
+```json
+{
+  "tool": "mouse_wheel",
+  "parameters": { "deltaY": 100 }
+}
+```
+
+### download_file
+Downloads a file from a URL to a local path.
+
+**Parameters:**
+- `url` (required): URL of the file
+  - Type: string
+- `outputPath` (required): Path on disk to save the file
+  - Type: string
+
+**Example:**
+```json
+{
+  "tool": "download_file",
+  "parameters": {
+    "url": "https://example.com/file.txt",
+    "outputPath": "/tmp/file.txt"
   }
 }
 ```
