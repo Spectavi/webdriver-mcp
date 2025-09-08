@@ -1,6 +1,6 @@
 {
   "name": "@spectavi/webdriver-mcp",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "WebDriver MCP Server",
   "type": "module",
   "main": "src/lib/server.js",
