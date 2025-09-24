@@ -1,125 +1,202 @@
 # WebDriver MCP Server
 
-A Model Context Protocol (MCP) server implementation for Selenium WebDriver.
+[![npm version](https://badge.fury.io/js/@spectavi%2Fwebdriver-mcp.svg)](https://badge.fury.io/js/@spectavi%2Fwebdriver-mcp)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+A powerful Model Context Protocol (MCP) server implementation for Selenium WebDriver, enabling AI agents to control web browsers programmatically.
+
+## Table of Contents
+
+- [Features](#features)
+- [Supported Browsers](#supported-browsers)
+- [Quick Start](#quick-start)
+- [Installation](#installation)
+- [Usage Examples](#usage-examples)
+- [API Reference](#api-reference)
+- [Development](#development)
+- [License](#license)
 
 ## Features
 
+**🚀 Browser Control**
 - Start browser sessions with customizable options
-- Navigate to URLs
-- Control navigation history (back, forward, refresh)
-- Find elements using various locator strategies
+- Navigate to URLs and control history (back, forward, refresh)
+- Support for headless mode
+
+**🎯 Element Interaction**
+- Find elements using various locator strategies (ID, CSS, XPath, etc.)
 - Click, type, and interact with elements
 - Wait for element visibility, text, or attribute changes
 - Retrieve element attributes, CSS values, and geometry
-- Manage windows and frames
-- Handle browser alerts
-- Manage cookies and browser storage
+
+**🖱️ Advanced Actions**
+- Mouse actions (hover, drag and drop, double/right click)
+- Keyboard input and key combinations
+- Scroll elements into view or by offset
+- Focus elements
+
+**🪟 Window & Frame Management**
+- Manage multiple windows and frames
+- Handle browser alerts and dialogs
 - Adjust window size (set, maximize, minimize)
-- Scroll elements into view or by offset and focus elements
-- Manage multiple sessions (list, switch, rename)
-- Perform mouse actions (hover, drag and drop)
-- Handle keyboard input
-- Take screenshots
-- Record video of the browser session
+
+**💾 Data Management**
+- Manage cookies and browser storage (localStorage, sessionStorage)
+- Upload and download files
+- Clipboard operations
+
+**📊 Debugging & Testing**
+- Take screenshots and record video sessions
 - Retrieve console, network, and performance logs
 - Assert element presence, text, and attributes
-- Perform clipboard operations, key chords, mouse wheel scrolling, and file downloads
-- Upload files
-- Support for headless mode
-- Execute JavaScript
+- Execute custom JavaScript
+
+**⚡ Session Management**
+- Manage multiple browser sessions
+- Switch between sessions and rename them
 
 ## Supported Browsers
 
-- Chrome
-- Firefox
-- MS Edge
+| Browser | Status |
+|---------|--------|
+| Chrome | ✅ Supported |
+| Firefox | ✅ Supported |
+| MS Edge | ✅ Supported |
 
-### Add to Claude Code
+## Quick Start
 
-Run this inside of each directory you're using Claude Code in:
+### Option 1: Claude Code (Recommended)
+
+For Claude Code users, run this in your project directory:
 
 ```bash
 claude mcp add webdriver -- npx -y @spectavi/webdriver-mcp@latest
 ```
 
-### Add manually to desktop or CLI
+### Option 2: Manual MCP Configuration
 
-* Name: `WebDriver MCP`
-* Description: `Describes WebDriver API to AI agents.`
-* Command: `npx -y @spectavi/webdriver-mcp@latest`
-
-## Use with other MCP clients (e.g. Claude Desktop, etc)
-```json
-{
-  "mcpServers": {
-    "selenium": {
-      "command": "npx",
-      "args": ["-y", "@spectavi/webdriver-mcp"]
-    }
-  }
-}
-```
-
----
-
-## Development
-
-To work on this project:
-
-1. Clone the repository
-2. Install dependencies: `npm install`
-3. Run the server: `npm start`
-
-### Installation
-
-#### Manual Installation
-```bash
-npm install -g @spectavi/webdriver-mcp
-```
-
-
-### Usage
-
-Start the server by running:
-
-```bash
-webdriver-mcp
-```
-
-Or use with NPX in your MCP configuration:
+Add to your MCP client configuration:
 
 ```json
 {
   "mcpServers": {
     "webdriver": {
       "command": "npx",
-      "args": [
-        "-y",
-        "@spectavi/webdriver-mcp"
-      ]
+      "args": ["-y", "@spectavi/webdriver-mcp@latest"]
     }
   }
 }
 ```
 
+## Installation
+
+### Global Installation
+
+```bash
+npm install -g @spectavi/webdriver-mcp
+```
+
+### Usage
+
+Start the server directly:
+
+```bash
+webdriver-mcp
+```
+
+## Usage Examples
+
+### Basic Browser Automation
+
+```json
+{
+  "tool": "start_browser",
+  "parameters": {
+    "browser": "chrome",
+    "options": {
+      "headless": false
+    }
+  }
+}
+```
+
+```json
+{
+  "tool": "navigate",
+  "parameters": {
+    "url": "https://example.com"
+  }
+}
+```
+
+### Element Interaction
+
+```json
+{
+  "tool": "click_element",
+  "parameters": {
+    "by": "css",
+    "value": ".submit-button"
+  }
+}
+```
+
+```json
+{
+  "tool": "send_keys",
+  "parameters": {
+    "by": "id",
+    "value": "username",
+    "text": "testuser"
+  }
+}
+```
+
+### Taking Screenshots
+
+```json
+{
+  "tool": "take_screenshot",
+  "parameters": {
+    "outputPath": "/path/to/screenshot.png"
+  }
+}
+```
+
+## Development
+
+To contribute to this project:
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/spectavi/webdriver-mcp.git
+   cd webdriver-mcp
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Run the development server**
+   ```bash
+   npm start
+   ```
 
 
-## Tools
 
-### start_browser
+## API Reference
+
+### Browser Session Management
+
+#### start_browser
 Launches a browser session.
 
 **Parameters:**
-- `browser` (required): Browser to launch
-  - Type: string
-  - Enum: ["chrome", "firefox", "edge"]
+- `browser` (required): Browser to launch (`"chrome"`, `"firefox"`, `"edge"`)
 - `options`: Browser configuration options
-  - Type: object
-  - Properties:
-    - `headless`: Run browser in headless mode
-      - Type: boolean
-    - `arguments`: Additional browser arguments
-      - Type: array of strings
+  - `headless`: Run browser in headless mode (boolean)
+  - `arguments`: Additional browser arguments (array of strings)
 
 **Example:**
 ```json
@@ -135,12 +212,69 @@ Launches a browser session.
 }
 ```
 
-### navigate
+#### close_session
+Closes the current browser session and cleans up resources.
+
+**Example:**
+```json
+{
+  "tool": "close_session",
+  "parameters": {}
+}
+```
+
+#### list_sessions
+Lists active browser session IDs.
+
+**Example:**
+```json
+{
+  "tool": "list_sessions",
+  "parameters": {}
+}
+```
+
+#### switch_session
+Switches to a different active browser session.
+
+**Parameters:**
+- `sessionId` (required): Session ID to switch to
+
+**Example:**
+```json
+{
+  "tool": "switch_session",
+  "parameters": {
+    "sessionId": "chrome_123"
+  }
+}
+```
+
+#### rename_session
+Renames an existing browser session.
+
+**Parameters:**
+- `oldId` (required): Current session ID
+- `newId` (required): New session ID
+
+**Example:**
+```json
+{
+  "tool": "rename_session",
+  "parameters": {
+    "oldId": "chrome_123",
+    "newId": "primary"
+  }
+}
+```
+
+### Navigation
+
+#### navigate
 Navigates to a URL.
 
 **Parameters:**
 - `url` (required): URL to navigate to
-  - Type: string
 
 **Example:**
 ```json
@@ -152,11 +286,8 @@ Navigates to a URL.
 }
 ```
 
-### go_back
+#### go_back
 Navigates back in browser history.
-
-**Parameters:**
-- _None_
 
 **Example:**
 ```json
@@ -166,11 +297,8 @@ Navigates back in browser history.
 }
 ```
 
-### go_forward
+#### go_forward
 Navigates forward in browser history.
-
-**Parameters:**
-- _None_
 
 **Example:**
 ```json
@@ -180,11 +308,8 @@ Navigates forward in browser history.
 }
 ```
 
-### refresh_page
+#### refresh_page
 Refreshes the current page.
-
-**Parameters:**
-- _None_
 
 **Example:**
 ```json
@@ -194,11 +319,10 @@ Refreshes the current page.
 }
 ```
 
-### get_page_title
-Retrieves the current page title.
+### Page Information
 
-**Parameters:**
-- _None_
+#### get_page_title
+Retrieves the current page title.
 
 **Example:**
 ```json
@@ -208,11 +332,8 @@ Retrieves the current page title.
 }
 ```
 
-### get_current_url
+#### get_current_url
 Retrieves the current page URL.
-
-**Parameters:**
-- _None_
 
 **Example:**
 ```json
@@ -222,11 +343,8 @@ Retrieves the current page URL.
 }
 ```
 
-### get_page_source
+#### get_page_source
 Retrieves the current page source.
-
-**Parameters:**
-- _None_
 
 **Example:**
 ```json
@@ -236,7 +354,9 @@ Retrieves the current page source.
 }
 ```
 
-### find_element
+### Element Location
+
+#### find_element
 Finds an element on the page.
 
 **Parameters:**
@@ -1060,14 +1180,14 @@ Verifies that an element attribute has the expected value.
 }
 ```
 
-### execute_javascript
+### JavaScript Execution
+
+#### execute_javascript
 Executes JavaScript code on the current page.
 
 **Parameters:**
 - `script` (required): JavaScript code to execute
-  - Type: string
 - `args` (optional): Arguments to pass to the script
-  - Type: array
 
 **Example:**
 ```json
@@ -1080,29 +1200,14 @@ Executes JavaScript code on the current page.
 }
 ```
 
-### close_session
-Closes the current browser session and cleans up resources.
+### Window Management
 
-**Parameters:**
-None required
-
-**Example:**
-```json
-{
-  "tool": "close_session",
-  "parameters": {}
-}
-```
-
-
-### set_window_size
+#### set_window_size
 Sets the browser window size.
 
 **Parameters:**
-- `width` (required): Window width in pixels  
-  - Type: number
-- `height` (required): Window height in pixels  
-  - Type: number
+- `width` (required): Window width in pixels
+- `height` (required): Window height in pixels
 
 **Example:**
 ```json
@@ -1112,29 +1217,27 @@ Sets the browser window size.
 }
 ```
 
-### maximize_window
+#### maximize_window
 Maximizes the browser window.
-
-**Parameters:**
-None
 
 **Example:**
 ```json
 { "tool": "maximize_window", "parameters": {} }
 ```
 
-### minimize_window
+#### minimize_window
 Minimizes the browser window.
-
-**Parameters:**
-None
 
 **Example:**
 ```json
 { "tool": "minimize_window", "parameters": {} }
 ```
 
-### get_cookies
+### Data Management
+
+#### Cookies
+
+##### get_cookies
 Retrieves all cookies for the current page.
 
 **Parameters:**
@@ -1376,8 +1479,11 @@ Renames an existing browser session.
   "parameters": { "oldId": "chrome_123", "newId": "primary" }
 }
 ```
+
+> **Note:** This API reference shows the most commonly used tools. The WebDriver MCP server includes many more tools for comprehensive browser automation. Each tool supports detailed configuration options and error handling.
+
 ## License
 
-MIT
+MIT License
 
-* Project forked from https://github.com/angiejones/mcp-selenium
+**Attribution:** This project is forked from [mcp-selenium](https://github.com/angiejones/mcp-selenium) by Angie Jones.

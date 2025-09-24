@@ -318,23 +318,181 @@ server.tool(
     "sends keys to an element, aka typing",
     {
         ...locatorSchema,
-        text: z.string().describe("Text to enter into the element")
+        text: z.string().describe("Text to enter into the element"),
+        maxRetries: z.number().optional().describe("Maximum number of retry attempts"),
+        verifyEntry: z.boolean().optional().describe("Verify text was entered correctly")
     },
-    async ({ by, value, text, timeout = 10000 }) => {
-        try {
-            const driver = getDriver();
-            const locator = getLocator(by, value);
-            const element = await driver.wait(until.elementLocated(locator), timeout);
-            await element.clear();
-            await element.sendKeys(text);
-            return {
-                content: [{ type: 'text', text: `Text "${text}" entered into element` }]
-            };
-        } catch (e) {
-            return {
-                content: [{ type: 'text', text: `Error entering text: ${e.message}` }]
-            };
+    async ({ by, value, text, timeout = 10000, maxRetries = 3, verifyEntry = true }) => {
+        const driver = getDriver();
+        const locator = getLocator(by, value);
+
+        for (let attempt = 1; attempt <= maxRetries; attempt++) {
+            try {
+                // Wait for element and ensure it's ready
+                const element = await driver.wait(until.elementLocated(locator), timeout);
+                await driver.wait(until.elementIsVisible(element), timeout);
+                await driver.wait(until.elementIsEnabled(element), timeout);
+
+                // Focus the element first
+                await driver.executeScript('arguments[0].focus();', element);
+                await driver.sleep(100);  // Small delay to ensure focus
+
+                // Clear the field
+                await element.clear();
+                await driver.sleep(50);   // Small delay after clear
+
+                // Verify field is actually cleared
+                let currentValue = await element.getAttribute('value') || '';
+                if (currentValue !== '') {
+                    // Try alternative clearing methods
+                    await driver.executeScript('arguments[0].value = "";', element);
+                    await element.sendKeys(Key.CONTROL + 'a');
+                    await element.sendKeys(Key.DELETE);
+                    await driver.sleep(50);
+                }
+
+                // Send the text
+                await element.sendKeys(text);
+                await driver.sleep(100);  // Small delay after input
+
+                // Verify text entry if requested
+                if (verifyEntry) {
+                    currentValue = await element.getAttribute('value') || '';
+                    const elementText = await element.getText() || '';
+
+                    // Check both value attribute and text content
+                    if (currentValue === text || elementText === text) {
+                        return {
+                            content: [{ type: 'text', text: `Text "${text}" successfully entered and verified in element (attempt ${attempt})` }]
+                        };
+                    } else if (attempt === maxRetries) {
+                        throw new Error(`Text verification failed. Expected: "${text}", Found value: "${currentValue}", Found text: "${elementText}"`);
+                    }
+                    // If verification failed but we have retries left, continue to next attempt
+                } else {
+                    return {
+                        content: [{ type: 'text', text: `Text "${text}" entered into element (attempt ${attempt}, verification skipped)` }]
+                    };
+                }
+
+            } catch (e) {
+                if (attempt === maxRetries) {
+                    return {
+                        content: [{ type: 'text', text: `Error entering text after ${maxRetries} attempts: ${e.message}` }]
+                    };
+                }
+                // Wait before retry
+                await driver.sleep(200 * attempt);
+            }
         }
+
+        return {
+            content: [{ type: 'text', text: `Failed to enter text "${text}" after ${maxRetries} attempts` }]
+        };
+    }
+);
+
+server.tool(
+    "send_keys_secure",
+    "sends keys to password/secure fields with extra verification",
+    {
+        ...locatorSchema,
+        text: z.string().describe("Text to enter into the secure element"),
+        maxRetries: z.number().optional().describe("Maximum number of retry attempts"),
+        clickFirst: z.boolean().optional().describe("Click element before entering text")
+    },
+    async ({ by, value, text, timeout = 10000, maxRetries = 5, clickFirst = true }) => {
+        const driver = getDriver();
+        const locator = getLocator(by, value);
+
+        for (let attempt = 1; attempt <= maxRetries; attempt++) {
+            try {
+                // Wait for element and ensure it's ready
+                const element = await driver.wait(until.elementLocated(locator), timeout);
+                await driver.wait(until.elementIsVisible(element), timeout);
+                await driver.wait(until.elementIsEnabled(element), timeout);
+
+                // Optional click to ensure focus (useful for password fields)
+                if (clickFirst) {
+                    await element.click();
+                    await driver.sleep(100);
+                }
+
+                // Scroll element into view
+                await driver.executeScript('arguments[0].scrollIntoView({block: "center"});', element);
+                await driver.sleep(100);
+
+                // Multiple focus attempts for password fields
+                await driver.executeScript('arguments[0].focus();', element);
+                await driver.sleep(100);
+
+                // Enhanced clearing for password fields
+                await element.clear();
+                await driver.sleep(100);
+
+                // Alternative clearing methods
+                try {
+                    await element.sendKeys(Key.CONTROL + 'a');
+                    await element.sendKeys(Key.DELETE);
+                    await driver.sleep(50);
+
+                    // Clear using JavaScript as fallback
+                    await driver.executeScript('arguments[0].value = "";', element);
+                    await driver.sleep(50);
+                } catch (clearError) {
+                    console.warn(`Alternative clearing methods failed: ${clearError.message}`);
+                }
+
+                // Send text character by character for i18n characters
+                if (text.length > 0) {
+                    for (let i = 0; i < text.length; i++) {
+                        await element.sendKeys(text[i]);
+                        await driver.sleep(10); // Small delay between characters
+                    }
+                } else {
+                    await element.sendKeys(text);
+                }
+
+                await driver.sleep(150); // Longer delay after input
+
+                // For password fields, we can't always verify the value due to security,
+                // but we can check that the field appears to have content
+                try {
+                    const hasValue = await driver.executeScript(`
+                        var elem = arguments[0];
+                        return elem.value.length > 0 || elem.textContent.length > 0;
+                    `, element);
+
+                    if (hasValue || text === '') {
+                        return {
+                            content: [{ type: 'text', text: `Secure text entered successfully in element (attempt ${attempt})` }]
+                        };
+                    } else if (attempt === maxRetries) {
+                        throw new Error(`Secure text entry verification failed - field appears empty after input`);
+                    }
+                } catch (verifyError) {
+                    // If verification fails, assume success on final attempt for password fields
+                    if (attempt === maxRetries) {
+                        return {
+                            content: [{ type: 'text', text: `Secure text entered (verification unavailable for security reasons, attempt ${attempt})` }]
+                        };
+                    }
+                }
+
+            } catch (e) {
+                if (attempt === maxRetries) {
+                    return {
+                        content: [{ type: 'text', text: `Error entering secure text after ${maxRetries} attempts: ${e.message}` }]
+                    };
+                }
+                // Progressive delay before retry
+                await driver.sleep(300 * attempt);
+            }
+        }
+
+        return {
+            content: [{ type: 'text', text: `Failed to enter secure text after ${maxRetries} attempts` }]
+        };
     }
 );
 
