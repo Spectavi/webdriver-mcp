@@ -250,14 +250,31 @@ server.tool(
 
 server.tool(
     "get_page_source",
-    "retrieves the current page source",
-    {},
-    async () => {
+    "retrieves the current page source with pagination",
+    {
+        page: z.number().optional().describe("Page number (1-indexed, default: 1)"),
+        pageSize: z.number().optional().describe("Characters per page (default: 50000)")
+    },
+    async ({ page = 1, pageSize = 50000 }) => {
         try {
             const driver = getDriver();
             const source = await driver.getPageSource();
+            const totalChars = source.length;
+            const totalPages = Math.ceil(totalChars / pageSize);
+
+            if (page < 1 || page > totalPages) {
+                return {
+                    content: [{ type: 'text', text: `Invalid page number. Total pages: ${totalPages}` }]
+                };
+            }
+
+            const startIdx = (page - 1) * pageSize;
+            const endIdx = Math.min(startIdx + pageSize, totalChars);
+            const pageContent = source.substring(startIdx, endIdx);
+
+            const metadata = `[Page ${page}/${totalPages} | Characters ${startIdx + 1}-${endIdx} of ${totalChars}]`;
             return {
-                content: [{ type: 'text', text: source }]
+                content: [{ type: 'text', text: `${metadata}\n\n${pageContent}` }]
             };
         } catch (e) {
             return {
@@ -1618,14 +1635,31 @@ server.tool(
 // Logging and Diagnostics Tools
 server.tool(
     "get_console_logs",
-    "retrieves browser console logs",
-    {},
-    async () => {
+    "retrieves browser console logs with pagination",
+    {
+        page: z.number().optional().describe("Page number (1-indexed, default: 1)"),
+        pageSize: z.number().optional().describe("Log entries per page (default: 100)")
+    },
+    async ({ page = 1, pageSize = 100 }) => {
         try {
             const driver = getDriver();
             const logs = await driver.manage().logs().get('browser');
+            const totalLogs = logs.length;
+            const totalPages = Math.ceil(totalLogs / pageSize);
+
+            if (page < 1 || page > totalPages) {
+                return {
+                    content: [{ type: 'text', text: `Invalid page number. Total pages: ${totalPages} (${totalLogs} log entries)` }]
+                };
+            }
+
+            const startIdx = (page - 1) * pageSize;
+            const endIdx = Math.min(startIdx + pageSize, totalLogs);
+            const pageLogs = logs.slice(startIdx, endIdx);
+
+            const metadata = `[Page ${page}/${totalPages} | Log entries ${startIdx + 1}-${endIdx} of ${totalLogs}]`;
             return {
-                content: [{ type: 'text', text: JSON.stringify(logs, null, 2) }]
+                content: [{ type: 'text', text: `${metadata}\n\n${JSON.stringify(pageLogs, null, 2)}` }]
             };
         } catch (e) {
             return {
@@ -1637,9 +1671,12 @@ server.tool(
 
 server.tool(
     "get_network_logs",
-    "retrieves network logs",
-    {},
-    async () => {
+    "retrieves network logs with pagination",
+    {
+        page: z.number().optional().describe("Page number (1-indexed, default: 1)"),
+        pageSize: z.number().optional().describe("Network events per page (default: 100)")
+    },
+    async ({ page = 1, pageSize = 100 }) => {
         try {
             const driver = getDriver();
             const logs = await driver.manage().logs().get('performance');
@@ -1652,8 +1689,23 @@ server.tool(
                     }
                 })
                 .filter(msg => msg && msg.method && msg.method.startsWith('Network.'));
+
+            const totalEvents = networkEvents.length;
+            const totalPages = Math.ceil(totalEvents / pageSize);
+
+            if (page < 1 || page > totalPages) {
+                return {
+                    content: [{ type: 'text', text: `Invalid page number. Total pages: ${totalPages} (${totalEvents} network events)` }]
+                };
+            }
+
+            const startIdx = (page - 1) * pageSize;
+            const endIdx = Math.min(startIdx + pageSize, totalEvents);
+            const pageEvents = networkEvents.slice(startIdx, endIdx);
+
+            const metadata = `[Page ${page}/${totalPages} | Network events ${startIdx + 1}-${endIdx} of ${totalEvents}]`;
             return {
-                content: [{ type: 'text', text: JSON.stringify(networkEvents, null, 2) }]
+                content: [{ type: 'text', text: `${metadata}\n\n${JSON.stringify(pageEvents, null, 2)}` }]
             };
         } catch (e) {
             return {
@@ -1760,28 +1812,19 @@ server.tool(
 
 server.tool(
     "take_screenshot",
-    "captures a screenshot of the current page",
+    "captures a screenshot of the current page and saves it to a file",
     {
-        outputPath: z.string().optional().describe("Optional path where to save the screenshot. If not provided, returns base64 data.")
+        outputPath: z.string().describe("Path where to save the screenshot (required to avoid token limits)")
     },
     async ({ outputPath }) => {
         try {
             const driver = getDriver();
             const screenshot = await driver.takeScreenshot();
-            if (outputPath) {
-                const fs = await import('fs');
-                await fs.promises.writeFile(outputPath, screenshot, 'base64');
-                return {
-                    content: [{ type: 'text', text: `Screenshot saved to ${outputPath}` }]
-                };
-            } else {
-                return {
-                    content: [
-                        { type: 'text', text: 'Screenshot captured as base64:' },
-                        { type: 'text', text: screenshot }
-                    ]
-                };
-            }
+            const fs = await import('fs');
+            await fs.promises.writeFile(outputPath, screenshot, 'base64');
+            return {
+                content: [{ type: 'text', text: `Screenshot saved to ${outputPath}` }]
+            };
         } catch (e) {
             return {
                 content: [{ type: 'text', text: `Error taking screenshot: ${e.message}` }]
